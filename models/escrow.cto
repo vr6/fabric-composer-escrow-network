@@ -1,0 +1,133 @@
+/**
+ * Escrow network model
+ */
+namespace org.acme.network.escrow
+
+enum OrderStatus {
+    o ACCOUNT_CREATED
+    o SELLER_DEPOSIT_RECEIVED
+    o BUYER_DEPOSIT_RECEIVED
+    o SHIPPED
+    o DELIVERED
+    o REFUNDED
+    o RESOLVED
+}
+asset PurchaseOrder identified by orderId {
+    o String            orderId
+    o String            description
+    o OrderStatus       status default = "UNPAID"
+    o DateTime          postingDate
+    o DateTime          paymentDate
+    o Double            grossAmount
+    o String            currency
+    --> Party           buyer
+    --> Party           seller
+    --> BankAccount     escrowAccount
+}
+participant Party identified by email {
+    o String            email
+    o String            firstName
+    o String            lastName
+    o Double            depositBalance
+    o String            currency
+    --> DepositStatus   depositStatus
+    --> BankAccount     account
+}
+participant NetworkBank identified by swiftCode {
+    o String            swiftCode
+    o String            bankName
+    o String            apiURL
+    o String            apiToken
+}
+concept BankAccount {
+    o String            accountNumber 
+    o String            swiftCode
+    o String            bankName
+    o String            accountHolderName
+}
+event OrderCreateNotification {
+    o String            orderId
+    o String            sellerEmail
+    o String            buyerEmail
+    o DateTime          timestamp    
+}
+event AccountCreateRequest {
+    o String            orderId
+    o DateTime          timestamp    
+}
+event MoveFundsRequest {
+    o String            orderId
+    o Double            amount
+    --> BankAccount     fromAccount
+    --> BankAccount     toAccount
+    o DateTime          timestamp    
+}
+event AccountCreatedNotification {
+    o String            orderId
+    --> BankAccount     account
+    o DateTime          timestamp    
+}
+event DepositNotification {
+    o String            orderId
+    o Double            sellerBalance
+    o Double            buyerBalance
+    o String            currency
+    o DateTime          timestamp    
+}
+event OrderShipmentNotification {
+    o String            orderId
+    o DateTime          timestamp    
+}
+event OrderReceivedNotification {
+    o String            orderId
+    o DateTime          timestamp    
+}
+event OrderDeliveryNotification {
+    o String            orderId
+    o DateTime          timestamp    
+}
+transaction NewPurchaseOrder {
+    o String            orderId
+    o String            description
+    o OrderStatus       status default = "UNPAID"
+    o DateTime          postingDate
+    o Double            grossAmount
+    o String            currency
+    --> Party           buyer
+    --> Party           seller
+    /* escrow account is created by the transaction processor */
+}
+transaction NewEscrowAccount {
+    o String            orderId
+    o String            swiftCode
+    --> BankAccount     account
+    o DateTime          timestamp    
+}
+transaction DepositCredit {
+    o String            orderId
+    o String            swiftCode
+    o String            partyEmail
+    o Double            amount
+    o Double            balance
+    o String            currency
+    o DateTime          timestamp    
+}
+transaction DepositDebit {
+    o String            orderId
+    o String            swiftCode
+    o String            partyEmail
+    o Double            amount
+    o Double            balance
+    o String            currency
+    o DateTime          timestamp    
+}
+transaction OrderShipment {
+    o String            orderId
+    o String            sellerEmail
+    o DateTime          timestamp    
+}
+transaction OrderDelivery {
+    o String            orderId           
+    o String            buyerEmail
+    o DateTime          timestamp    
+}

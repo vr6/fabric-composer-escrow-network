@@ -1,0 +1,52 @@
+/**
+ * Access control rules for escrow network
+ */
+
+rule CreatePurchaseOrder {
+  description: "Only seller creates the purchase order"
+  participant(p): "org.acme.network.escrow.Seller"
+  operation: CREATE
+  resource(r): "org.acme.network.escrow.NewPurchaseOrder"
+  condition: ( r.seller.getIdentifier() == p.getIdentifier() )
+  action: ALLOW
+}
+rule CreateAccountNotify {
+  description: "Only the network bank can send the notification"
+  participant(p): "org.acme.network.escrow.NetworkBank"
+  operation: UPDATE
+  resource(r): "org.acme.network.escrow.NewEscrowAccount"
+  condition: ( r.swiftCode == p.getIdentifier() )
+  action: ALLOW
+}
+rule DepositCredit {
+  description: "Only the network bank can send the notification"
+  participant(p): "org.acme.network.escrow.NetworkBank"
+  operation: UPDATE
+  resource(r): "org.acme.network.escrow.DepositCredit"
+  condition: ( r.swiftCode == p.getIdentifier() )
+  action: ALLOW
+}
+rule DepositDebit {
+  description: "Only the network bank can send the notification"
+  participant(p): "org.acme.network.escrow.NetworkBank"
+  operation: UPDATE
+  resource(r): "org.acme.network.escrow.DepositCredit"
+  condition: ( r.swiftCode == p.getIdentifier() )
+  action: ALLOW
+}
+rule OrderShipment {
+  description: "Only seller can send the notification"
+  participant(p): "org.acme.network.escrow.Seller"
+  operation: UPDATE
+  resource(r): "org.acme.network.escrow.OrderShipment"
+  condition: ( r.sellerEmail == p.getIdentifier() )
+  action: ALLOW
+}
+rule OrderDelivery {
+  description: "Only buyer can send the notification"
+  participant(p): "org.acme.network.escrow.Buyer"
+  operation: UPDATE
+  resource(r): "org.acme.network.escrow.OrderDelivery
+  condition: ( r.buyerEmail == p.getIdentifier() )
+  action: ALLOW
+}
