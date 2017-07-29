@@ -16,5 +16,9 @@ This HyperLedger Fabric smart contract defines a two-party business network usin
 * The smart contract updates the purchase order as delivered
 * The deposit balances held within the smart socntracts are the representative tokens corresponding to the escrow balances held by the network bank.
 
-Note: The refund procedures will requrie a notary participant or an oracle service to participate in the network and attest the situation requiring a refund. I did not implement the refund scenario to avoid making it complex.
+---
+![Workflow](./escrow.png)
+---
+
+Note: The refund procedures in the case of buyer being not happy with the order delivery, will requrie a notary participant or an oracle service to participate in the network and attest the situation requiring a refund. I did not implement the refund scenario to avoid making it complex.
 
